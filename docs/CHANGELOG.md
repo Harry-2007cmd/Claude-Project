@@ -34,3 +34,12 @@
 
 ### Changed
 - Replaced the default Vite template `App.jsx`/`main.jsx`/`index.html` with a minimal Campus Connect placeholder shell (the template referenced logo/CSS assets that don't exist in this repo).
+
+## [Unreleased] — 2026-07-29 (T1.0 — design tokens + base components)
+### Added
+- `frontend/src/styles/tokens.css`: the palette from ARCHITECTURE.md 5.2 verbatim, plus derived tokens (soft/tinted variants, hover surface, focus ring), a type scale, spacing scale, radii, shadows and a base reset. Component styles for Button/Card/Input live here too, so no page can redefine the palette.
+- Shared base components built for real: `components/ui/Button.jsx` (primary/secondary/ghost/danger × sm/md/lg, `block`, disabled), `components/ui/Card.jsx` (padding none/sm/md, `interactive` renders a keyboard-accessible `<button>`, `as` override), `components/ui/Input.jsx` (label, hint, error, `multiline` textarea, wired-up `aria-invalid`/`aria-describedby`).
+- `frontend/src/StyleGuide.jsx` — **throwaway** T1.0 sanity-check view rendering every token and component state. To be deleted along with its `App.jsx` import when the routing shell lands in T1.1.
+
+### Notes
+- The reference screenshots described in ARCHITECTURE.md 5.1 are still absent from `frontend/src/assets/design-reference/`; T1.0 was built from the Section 5.2 token spec alone. Layout-level details for Community/Carpool/Food (T1.3–T1.8) will need those images.

@@ -1,3 +1,255 @@
-/* tokens.css — placeholder created in Phase 0 (T0.1).
-   The real design tokens (ARCHITECTURE.md Section 5.2) are added in T1.0.
-   All colors/typography must live here, never per-page. */
+/* tokens.css — the single source of truth for color, type and spacing.
+   Palette is fixed by ARCHITECTURE.md Section 5.2 / DECISIONS.md D13:
+   one shared palette sitewide, per-feature layouts differ.
+   Never define a raw color in a page or component — add a token here. */
+
+:root {
+  /* ---- Palette (ARCHITECTURE.md 5.2 — do not add colors outside this block) ---- */
+  --color-bg:            #121218;   /* app background, dark */
+  --color-surface:       #1C1C24;   /* cards, sheets */
+  --color-primary:       #7B5CFA;   /* purple — primary buttons, active nav, links */
+  --color-primary-hover: #6A4CE0;
+  --color-accent:        #2FD9C4;   /* teal — map markers, highlights */
+  --color-text:          #F5F5F7;
+  --color-text-muted:    #9A9AA5;
+  --color-border:        #2A2A33;
+  --color-success:       #34D399;
+  --color-danger:        #F87171;
+
+  --radius-card: 16px;
+  --font-family: 'Inter', system-ui, sans-serif;
+
+  /* ---- Derived from the palette above (kept here so pages stay color-free) ---- */
+  --color-surface-hover: #23232D;
+  --color-primary-soft:  rgba(123, 92, 250, 0.16);  /* tinted fills, active nav bg */
+  --color-accent-soft:   rgba(47, 217, 196, 0.14);
+  --color-danger-soft:   rgba(248, 113, 113, 0.14);
+  --color-success-soft:  rgba(52, 211, 153, 0.14);
+  --color-focus-ring:    rgba(123, 92, 250, 0.45);
+  --color-overlay:       rgba(10, 10, 14, 0.6);
+
+  /* ---- Typography ---- */
+  --font-size-xs:   0.75rem;
+  --font-size-sm:   0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg:   1.125rem;
+  --font-size-xl:   1.375rem;
+  --font-size-2xl:  1.75rem;
+  --line-height-tight: 1.25;
+  --line-height-base:  1.55;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* ---- Spacing ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* ---- Radii, borders, shadow, motion ---- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.32);
+  --shadow-raised: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --transition-fast: 120ms ease;
+}
+
+/* ---- Base / reset ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-semibold);
+}
+
+h1 { font-size: var(--font-size-2xl); }
+h2 { font-size: var(--font-size-xl); }
+h3 { font-size: var(--font-size-lg); }
+
+p { margin: 0; }
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover { text-decoration: underline; }
+
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ---- Small shared utilities (used by the ui/ components and pages) ---- */
+.text-muted { color: var(--color-text-muted); }
+.text-sm    { font-size: var(--font-size-sm); }
+.text-xs    { font-size: var(--font-size-xs); }
+
+/* =========================================================================
+   Shared base components — styles for components/ui/Button, Card, Input.
+   These live here (not per-component CSS files) so the palette can't drift.
+   ========================================================================= */
+
+/* ---- Button ---- */
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-pill);
+  font-family: inherit;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+    color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.ui-button--sm { padding: var(--space-2) var(--space-3); font-size: var(--font-size-sm); }
+.ui-button--md { padding: var(--space-3) var(--space-5); font-size: var(--font-size-base); }
+.ui-button--lg { padding: var(--space-4) var(--space-6); font-size: var(--font-size-lg); }
+
+.ui-button--block { display: flex; width: 100%; }
+
+.ui-button--primary {
+  background: var(--color-primary);
+  color: var(--color-text);
+}
+.ui-button--primary:hover:not(:disabled) { background: var(--color-primary-hover); }
+
+.ui-button--secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+.ui-button--secondary:hover:not(:disabled) { background: var(--color-surface-hover); }
+
+.ui-button--ghost {
+  background: transparent;
+  color: var(--color-text-muted);
+}
+.ui-button--ghost:hover:not(:disabled) {
+  background: var(--color-primary-soft);
+  color: var(--color-text);
+}
+
+.ui-button--danger {
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+.ui-button--danger:hover:not(:disabled) { background: var(--color-danger); color: var(--color-bg); }
+
+.ui-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---- Card ---- */
+.ui-card {
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  color: var(--color-text);
+}
+
+.ui-card--pad-none { padding: 0; }
+.ui-card--pad-sm   { padding: var(--space-3); }
+.ui-card--pad-md   { padding: var(--space-5); }
+
+.ui-card--interactive {
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font: inherit;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.ui-card--interactive:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+}
+
+/* ---- Input ---- */
+.ui-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ui-field__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+.ui-field__control {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  transition: border-color var(--transition-fast);
+}
+
+.ui-field__control::placeholder { color: var(--color-text-muted); }
+
+.ui-field__control:hover:not(:disabled) { border-color: var(--color-text-muted); }
+
+.ui-field__control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.ui-field__control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+textarea.ui-field__control {
+  min-height: 96px;
+  resize: vertical;
+  line-height: var(--line-height-base);
+}
+
+.ui-field__control--error,
+.ui-field__control--error:focus {
+  border-color: var(--color-danger);
+}
+.ui-field__control--error:focus {
+  box-shadow: 0 0 0 3px var(--color-danger-soft);
+}
+
+.ui-field__hint  { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+.ui-field__error { font-size: var(--font-size-xs); color: var(--color-danger); }

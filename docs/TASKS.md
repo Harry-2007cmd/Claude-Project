@@ -9,7 +9,7 @@ Each task should be built, then manually checked/run, before starting the next o
 - [x] T0.3: Create `frontend/src/assets/design-reference/` folder for the template image (owner to drop file in when ready).
 
 ## Phase 1 — Frontend (mock data only, no backend calls yet)
-- [ ] T1.0: Create `styles/tokens.css` (design tokens per ARCHITECTURE.md Section 5.2) + base `components/ui/Button.jsx`, `Card.jsx`, `Input.jsx`. Render a throwaway style-guide view to sanity check colors before building real pages.
+- [x] T1.0: Create `styles/tokens.css` (design tokens per ARCHITECTURE.md Section 5.2) + base `components/ui/Button.jsx`, `Card.jsx`, `Input.jsx`. Render a throwaway style-guide view to sanity check colors before building real pages.
 - [ ] T1.1: Build shared shell — Navbar + routing (Community / Carpool / Food / Profile / Login / Signup). Community is the default post-login route.
 - [ ] T1.2: Build Login and Signup pages (UI only, form validation, fake submit handler) — this is the landing page.
 - [ ] T1.3: Build Community Feed page with mock post list (`PostCard` component), styled per ARCHITECTURE.md 5.2 (card-feed layout, dark palette).
