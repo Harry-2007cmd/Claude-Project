@@ -1,16 +1,43 @@
-# React + Vite
+# Campus Connect — frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React + Vite client for Campus Connect. See [`../docs/`](../docs) for the
+product and technical docs; this file only covers running the frontend.
 
-Currently, two official plugins are available:
+## Run it
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev      # http://localhost:5173
+```
 
-## React Compiler
+Other scripts: `npm run build`, `npm run preview`, `npm run lint` (oxlint).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Environment
 
-## Expanding the Oxlint configuration
+`.env` holds key **names** only — real values are pasted in manually and the
+file is gitignored (see ARCHITECTURE.md Section 6):
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```
+VITE_API_BASE_URL=http://localhost:8000
+VITE_GOOGLE_MAPS_API_KEY=PASTE_YOUR_GOOGLE_MAPS_JS_KEY_HERE
+```
+
+Maps render as a styled placeholder until the real key is added in Phase 3.
+
+## Layout
+
+```
+src/
+├── pages/        one component per route
+├── components/   feature components + ui/ (shared Button, Card, Input)
+├── styles/       tokens.css — the only place colors and component styles live
+├── api/          axios client + per-feature modules (wired in Phase 3)
+├── context/      AuthContext (fake auth in Phase 1) + useAuth hook
+├── mocks/        Phase 1 fixtures — deleted once the backend is wired
+├── utils/        date/formatting helpers
+└── assets/design-reference/   reference screenshots (not imported)
+```
+
+Two rules worth repeating: all colors come from `styles/tokens.css` (never
+per-page), and pages must not call the backend until Phase 3 — see
+[`../CLAUDE.md`](../CLAUDE.md).

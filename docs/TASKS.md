@@ -10,15 +10,16 @@ Each task should be built, then manually checked/run, before starting the next o
 
 ## Phase 1 — Frontend (mock data only, no backend calls yet)
 - [x] T1.0: Create `styles/tokens.css` (design tokens per ARCHITECTURE.md Section 5.2) + base `components/ui/Button.jsx`, `Card.jsx`, `Input.jsx`. Render a throwaway style-guide view to sanity check colors before building real pages.
-- [ ] T1.1: Build shared shell — Navbar + routing (Community / Carpool / Food / Profile / Login / Signup). Community is the default post-login route.
-- [ ] T1.2: Build Login and Signup pages (UI only, form validation, fake submit handler) — this is the landing page.
-- [ ] T1.3: Build Community Feed page with mock post list (`PostCard` component), styled per ARCHITECTURE.md 5.2 (card-feed layout, dark palette).
-- [ ] T1.4: Build Post Detail page with mock comments (`CommentList`, `CommentForm`).
-- [ ] T1.5: Build Carpool List page with mock rides (`RideCard`).
-- [ ] T1.6: Build Carpool Detail page with static `MapView` (placeholder map, real key added later) + mock request button, styled per the map/bottom-sheet reference.
-- [ ] T1.7: Build Carpool Create page (form: origin, destination, time, seats, notes).
-- [ ] T1.8: Build Food page with mock place list (`PlaceCard`) + static map placeholder, styled per the hero/grid reference.
-- [ ] T1.9: Build Profile page (mock data) — own info display/edit form + "My Posts" / "My Rides" tabs.
+- [x] T1.1: Build shared shell — Navbar + routing (Community / Carpool / Food / Profile / Login / Signup). Community is the default post-login route.
+- [x] T1.2: Build Login and Signup pages (UI only, form validation, fake submit handler) — this is the landing page.
+- [x] T1.3: Build Community Feed page with mock post list (`PostCard` component), styled per ARCHITECTURE.md 5.2 (card-feed layout, dark palette).
+- [x] T1.4: Build Post Detail page with mock comments (`CommentList`, `CommentForm`).
+- [x] T1.5: Build Carpool List page with mock rides (`RideCard`).
+- [x] T1.6: Build Carpool Detail page with static `MapView` (placeholder map, real key added later) + mock request button, styled per the map/bottom-sheet reference.
+- [x] T1.7: Build Carpool Create page (form: origin, destination, time, seats, notes).
+- [x] T1.8: Build Food page with mock place list (`PlaceCard`) + static map placeholder, styled per the hero/grid reference.
+- [x] T1.9: Build Profile page (mock data) — own info display/edit form + "My Posts" / "My Rides" tabs.
+- [x] T1.10: Build the "Ask a question" composer modal on the Community feed (title, body, optional department tag). Added after the fact — PRD 3.1 requires post creation but no original task covered it.
 - [ ] ✅ Checkpoint: full frontend click-through works end-to-end on mock data before moving to Phase 2.
 
 ## Phase 2 — Backend
@@ -33,7 +34,7 @@ Each task should be built, then manually checked/run, before starting the next o
 
 ## Phase 3 — Integration
 - [ ] T3.1: Wire `api/client.js` (axios) + `AuthContext` to real `/auth` endpoints. Replace fake login/signup.
-- [ ] T3.2: Wire Community pages to real `/posts` and `/comments` endpoints.
+- [ ] T3.2: Wire Community pages to real `/posts` and `/comments` endpoints (including the T1.10 composer → `POST /posts`).
 - [ ] T3.3: Wire Carpool pages to real `/carpool` endpoints; add real Google Maps key to render live maps.
 - [ ] T3.4: Wire Food page to real `/food/recommendations` endpoint; confirm map + place cards render live data.
 - [ ] T3.5: Wire Profile page to real `/profile` endpoints (view/edit info, My Posts, My Rides).

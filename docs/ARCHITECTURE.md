@@ -1,7 +1,7 @@
 # Campus Connect — Architecture & Technical Design
 
 ## 1. Tech Stack
-- **Frontend:** React (Vite), plain CSS or Tailwind (design system TBD — see Section 5, template image slot)
+- **Frontend:** React (Vite), **plain CSS** (settled at T1.0 — no Tailwind; all tokens and shared component styles live in `styles/tokens.css`), `react-router-dom` for routing
 - **Backend:** Python, FastAPI
 - **Database:** SQLite, auto-created and auto-seeded by a seed script (no manual DB setup required)
 - **Auth:** Email/password + JWT (via `passlib` for hashing, `python-jose` for JWT)
@@ -28,6 +28,7 @@ campus-connect/
 │   │   │   ├── PostCard.jsx
 │   │   │   ├── CommentList.jsx
 │   │   │   ├── CommentForm.jsx
+│   │   │   ├── PostComposer.jsx   # "Ask a question" modal (PRD 3.1)
 │   │   │   ├── RideCard.jsx
 │   │   │   ├── RideRequestButton.jsx
 │   │   │   ├── MapView.jsx
@@ -46,7 +47,17 @@ campus-connect/
 │   │   │   ├── food.js
 │   │   │   └── profile.js
 │   │   ├── context/
-│   │   │   └── AuthContext.jsx
+│   │   │   ├── AuthContext.jsx    # AuthProvider component
+│   │   │   ├── authStore.js       # the context object
+│   │   │   └── useAuth.js         # the consumer hook
+│   │   │   # split three ways so Vite fast refresh works (a file may export
+│   │   │   # only components, or only non-components — not a mix)
+│   │   ├── mocks/                 # Phase 1 fixtures only — deleted at Phase 3
+│   │   │   ├── community.js
+│   │   │   ├── carpool.js
+│   │   │   └── food.js
+│   │   ├── utils/
+│   │   │   └── date.js            # relative timestamps, avatar initials
 │   │   ├── assets/
 │   │   │   └── design-reference/   ← PUT YOUR TEMPLATE IMAGE HERE
 │   │   ├── App.jsx
@@ -192,6 +203,11 @@ Uploaded reference screenshots live conceptually in `frontend/src/assets/design-
 ### 5.2 Unified design decision
 Per owner direction ("same color theme, each feature has its own design"): the site uses **one shared color palette and typography sitewide**, while each feature keeps **its own layout/structure** from its reference, re-skinned into that shared palette.
 
+**Button shape (from the references, settled at T1.2):** CTAs are rectangular
+(`--radius-md`), uppercase and letter-spaced — matching `10L`/`02A` — not pills.
+Disabled buttons render as a flat slate block with muted text (`02C`, `05A`),
+never a faded primary. Secondary buttons are outlined in purple (`02A`).
+
 **Shared tokens (`frontend/src/styles/tokens.css`):**
 ```css
 :root {
@@ -238,7 +254,10 @@ Claude Code should **only reference key names and file locations**, never genera
 DATABASE_URL=sqlite:///./campus_connect.db
 JWT_SECRET_KEY=PASTE_YOUR_JWT_SECRET_HERE
 GOOGLE_PLACES_API_KEY=PASTE_YOUR_GOOGLE_PLACES_KEY_HERE
+FRONTEND_ORIGIN=http://localhost:5173
 ```
+
+(`FRONTEND_ORIGIN` is not a secret — it's the single origin CORS is restricted to, see Section 7.)
 
 **frontend/.env**
 ```

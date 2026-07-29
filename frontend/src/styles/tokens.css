@@ -112,29 +112,860 @@ a:hover { text-decoration: underline; }
 .text-xs    { font-size: var(--font-size-xs); }
 
 /* =========================================================================
+   App shell — Navbar + page column (T1.1).
+   ========================================================================= */
+
+.app-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell__main {
+  flex: 1;
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-7);
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--color-surface);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.navbar__inner {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.navbar__brand {
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-lg);
+}
+.navbar__brand:hover { text-decoration: none; color: var(--color-primary); }
+
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__link {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.navbar__link:hover {
+  text-decoration: none;
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.navbar__link--active,
+.navbar__link--active:hover {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+/* Centered message block — 404 now, empty states later (PRD Section 6). */
+.page-state {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: center;
+  text-align: center;
+  padding: var(--space-7) var(--space-4);
+}
+
+/* =========================================================================
+   Community (T1.3 / T1.4) — chips + card feed, layout from the community
+   reference re-skinned into the shared dark palette (D13).
+   ========================================================================= */
+
+.page-header {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+/* Horizontal, scrollable filter chips (reference: subreddit tag row). */
+.chips {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-5);
+  scrollbar-width: thin;
+}
+
+.chip {
+  flex: 0 0 auto;
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.chip:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.chip--active,
+.chip--active:hover {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.feed__list {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.post-card {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.post-card__author {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.post-card__author-text {
+  display: grid;
+  line-height: var(--line-height-tight);
+}
+
+.post-card__author-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.post-card__time { margin-left: auto; }
+
+.post-card__title {
+  font-size: var(--font-size-lg);
+}
+
+/* Feed shows a preview; full text is on the detail page (PRD Section 6). */
+.post-card__body {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.post-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.avatar--sm { width: 28px; height: 28px; }
+
+.tag {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+/* ---- Modal (post composer) ---- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: var(--color-overlay);
+  overflow-y: auto;
+}
+
+.modal__panel {
+  width: 100%;
+  max-width: 520px;
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-raised);
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* ---- Post detail ---- */
+
+.post-detail {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.post-detail__post {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+}
+
+.post-detail__body {
+  white-space: pre-wrap;
+  color: var(--color-text);
+}
+
+.post-detail__answers {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.comment-list {
+  display: grid;
+  gap: var(--space-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.comment {
+  display: flex;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.comment:last-child { border-bottom: none; padding-bottom: 0; }
+
+.comment__content {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.comment__meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.comment__author {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.comment__body {
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.comment-form {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.comment-form__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* =========================================================================
+   Carpool (T1.5–T1.7) — map + bottom-sheet layout from design-reference 10K/10L.
+   ========================================================================= */
+
+.page-header--with-action {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.ride-card,
+.ride-sheet {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.ride-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ride-card__distance {
+  margin-left: auto;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+/* "Your location → Destination" stack: teal origin dot, purple destination dot,
+   joined by a vertical connector. */
+.route {
+  display: grid;
+  gap: var(--space-3);
+  position: relative;
+}
+
+.route__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  position: relative;
+}
+
+.route__row:first-child::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 16px;
+  height: calc(100% + var(--space-3) - 12px);
+  border-left: 2px dotted var(--color-border);
+}
+
+.route__dot {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  margin-top: 4px;
+  border-radius: var(--radius-pill);
+}
+
+.route__dot--origin { background: var(--color-accent); }
+.route__dot--dest { background: var(--color-primary); }
+
+.route__labels {
+  display: grid;
+  line-height: var(--line-height-tight);
+  gap: 2px;
+  min-width: 0;
+}
+
+.route__title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.ride-card__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.tag--muted {
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+}
+
+.tag--primary {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+/* ---- Static map placeholder ---- */
+
+.map-view {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+}
+
+.map-view__canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.map-view__grid path {
+  stroke: var(--color-border);
+  stroke-width: 2;
+  fill: none;
+}
+
+.map-view__route {
+  stroke: var(--color-primary);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.map-view__pin--origin { fill: var(--color-accent); }
+.map-view__pin--dest { fill: var(--color-primary); }
+.map-view__pin-dot { fill: var(--color-bg); }
+
+.map-view__badge {
+  position: absolute;
+  left: var(--space-3);
+  bottom: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-overlay);
+  color: var(--color-text-muted);
+}
+
+/* ---- Ride detail ---- */
+
+.ride-detail,
+.ride-create {
+  display: grid;
+  gap: var(--space-5);
+}
+
+/* The sheet rides up over the map, as in the reference. */
+.ride-sheet {
+  margin-top: calc(var(--space-6) * -1);
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow-raised);
+}
+
+.ride-sheet__facts {
+  display: flex;
+  gap: var(--space-6);
+  margin: 0;
+}
+
+.ride-sheet__facts dt { margin-bottom: var(--space-1); }
+.ride-sheet__facts dd {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+.ride-requests {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.request-list {
+  display: grid;
+  gap: var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.request {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  flex-wrap: wrap;
+}
+
+.request__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.request__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* Request status pills — accepted / pending / declined. */
+.status {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  text-transform: capitalize;
+}
+
+.status--accepted { background: var(--color-success-soft); color: var(--color-success); }
+.status--pending { background: var(--color-primary-soft); color: var(--color-primary); }
+.status--declined { background: var(--color-danger-soft); color: var(--color-danger); }
+
+/* ---- Seat stepper ---- */
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+}
+
+.stepper__value {
+  flex: 1;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* =========================================================================
+   Food (T1.8) — hero banner + browse grid kept from the food reference,
+   recoloured from its red/orange/yellow into the shared palette (D13).
+   ========================================================================= */
+
+.food {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.food-hero {
+  border-radius: var(--radius-card);
+  border: var(--border-width) solid var(--color-border);
+  background:
+    radial-gradient(120% 140% at 100% 0%, var(--color-primary-soft) 0%, transparent 60%),
+    radial-gradient(90% 120% at 0% 100%, var(--color-accent-soft) 0%, transparent 55%),
+    var(--color-surface);
+  padding: var(--space-6) var(--space-5);
+}
+
+.food-hero__content {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 560px;
+}
+
+/* Search input and button on one line, as in the reference's hero bar. */
+.food-hero__search {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.food-hero__search .ui-field { flex: 1; }
+
+@media (max-width: 520px) {
+  .food-hero__search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.place-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: var(--space-4);
+}
+
+.place-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.place-card:hover { border-color: var(--color-primary); }
+
+/* Stands in for the Places photo until T3.4. */
+.place-card__media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 116px;
+  background:
+    linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-accent-soft) 100%),
+    var(--color-surface-hover);
+}
+
+.place-card__glyph { font-size: 2rem; }
+
+/* Corner badge — the reference's discount chip, now the rating. */
+.place-card__badge {
+  position: absolute;
+  left: var(--space-3);
+  bottom: calc(var(--space-3) * -1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.place-card__body {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  align-content: start;
+  flex: 1;
+}
+
+.place-card__name { font-size: var(--font-size-base); }
+
+.place-card__meta { color: var(--color-text-muted); }
+
+.place-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+/* =========================================================================
+   Profile (T1.9) — no reference screenshot; plain layout per ARCHITECTURE 5.2.
+   ========================================================================= */
+
+.profile {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.profile__header {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.profile__identity {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.profile__identity-text {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1;
+}
+
+.avatar--lg {
+  width: 64px;
+  height: 64px;
+  font-size: var(--font-size-lg);
+}
+
+.profile__bio {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.profile__stats {
+  display: flex;
+  gap: var(--space-6);
+  margin: 0;
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.profile__stats dt { margin-bottom: var(--space-1); }
+.profile__stats dd {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.profile__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* ---- Tabs ---- */
+
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.tab {
+  padding: var(--space-3) var(--space-4);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.tab:hover { color: var(--color-text); }
+
+.tab--active,
+.tab--active:hover {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* ---- Auth pages (T1.2) — layout from design-reference 02B/05A ---- */
+
+/* Full-height centered column for the auth pages (no Navbar). */
+.auth-shell {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6) var(--space-4);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  display: grid;
+  gap: var(--space-5);
+}
+
+.auth-card__header {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.auth-card__brand {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.auth-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* Side-by-side department / year row, collapses on narrow screens. */
+.auth-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+@media (max-width: 420px) {
+  .auth-form__row { grid-template-columns: 1fr; }
+}
+
+.auth-card__footer {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Form-level error banner (e.g. "wrong email or password"). */
+.auth-form__banner {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-soft);
+  border: var(--border-width) solid var(--color-danger);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+/* Signed-in identity block on the right of the Navbar. */
+.navbar__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.navbar__username {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .navbar__inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+  .navbar__links { justify-content: space-between; }
+}
+
+/* =========================================================================
    Shared base components — styles for components/ui/Button, Card, Input.
    These live here (not per-component CSS files) so the palette can't drift.
    ========================================================================= */
 
 /* ---- Button ---- */
+/* Shape follows the reference CTAs (design-reference 02A/10L: rectangular,
+   uppercase, letter-spaced) — not pills. */
 .ui-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
   border: var(--border-width) solid transparent;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   font-family: inherit;
   font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   line-height: 1;
   cursor: pointer;
   transition: background var(--transition-fast), border-color var(--transition-fast),
-    color var(--transition-fast), opacity var(--transition-fast);
+    color var(--transition-fast);
 }
 
-.ui-button--sm { padding: var(--space-2) var(--space-3); font-size: var(--font-size-sm); }
-.ui-button--md { padding: var(--space-3) var(--space-5); font-size: var(--font-size-base); }
-.ui-button--lg { padding: var(--space-4) var(--space-6); font-size: var(--font-size-lg); }
+.ui-button--sm { padding: var(--space-2) var(--space-3); font-size: var(--font-size-xs); }
+.ui-button--md { padding: var(--space-3) var(--space-5); font-size: var(--font-size-sm); }
+.ui-button--lg { padding: var(--space-4) var(--space-6); font-size: var(--font-size-base); }
 
 .ui-button--block { display: flex; width: 100%; }
 
@@ -144,12 +975,13 @@ a:hover { text-decoration: underline; }
 }
 .ui-button--primary:hover:not(:disabled) { background: var(--color-primary-hover); }
 
+/* Outlined, like "CREATE AN ACCOUNT" in reference 02A. */
 .ui-button--secondary {
-  background: var(--color-surface);
-  border-color: var(--color-border);
+  background: transparent;
+  border-color: var(--color-primary);
   color: var(--color-text);
 }
-.ui-button--secondary:hover:not(:disabled) { background: var(--color-surface-hover); }
+.ui-button--secondary:hover:not(:disabled) { background: var(--color-primary-soft); }
 
 .ui-button--ghost {
   background: transparent;
@@ -167,8 +999,12 @@ a:hover { text-decoration: underline; }
 }
 .ui-button--danger:hover:not(:disabled) { background: var(--color-danger); color: var(--color-bg); }
 
+/* Disabled reads as a flat slate block with muted text (reference 02C / 05A),
+   not a faded primary. Applies to every variant. */
 .ui-button:disabled {
-  opacity: 0.45;
+  background: var(--color-surface-hover);
+  border-color: transparent;
+  color: var(--color-text-muted);
   cursor: not-allowed;
 }
 
@@ -235,6 +1071,11 @@ a:hover { text-decoration: underline; }
 .ui-field__control:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+select.ui-field__control {
+  appearance: none;
+  cursor: pointer;
 }
 
 textarea.ui-field__control {

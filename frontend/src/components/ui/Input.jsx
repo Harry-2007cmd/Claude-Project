@@ -1,5 +1,6 @@
 // Input — shared labelled form field (T1.0). Styling lives in styles/tokens.css
-// (.ui-field*). Set `multiline` for a textarea (post bodies, comments, notes).
+// (.ui-field*). Renders an <input> by default; pass `multiline` for a textarea
+// (post bodies, comments, ride notes) or `as="select"` with <option> children.
 
 import { useId } from 'react';
 
@@ -8,8 +9,10 @@ export default function Input({
   hint,
   error,
   multiline = false,
+  as,
   id,
   className = '',
+  children,
   ...props
 }) {
   const generatedId = useId();
@@ -17,7 +20,7 @@ export default function Input({
   const hintId = `${fieldId}-hint`;
   const errorId = `${fieldId}-error`;
 
-  const Control = multiline ? 'textarea' : 'input';
+  const Control = as || (multiline ? 'textarea' : 'input');
 
   const controlClasses = ['ui-field__control', error ? 'ui-field__control--error' : '', className]
     .filter(Boolean)
@@ -38,7 +41,9 @@ export default function Input({
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy || undefined}
         {...props}
-      />
+      >
+        {children}
+      </Control>
       {error && (
         <span id={errorId} className="ui-field__error" role="alert">
           {error}
