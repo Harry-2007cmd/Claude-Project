@@ -9,14 +9,16 @@ Each task should be built, then manually checked/run, before starting the next o
 - [ ] T0.3: Create `frontend/src/assets/design-reference/` folder for the template image (owner to drop file in when ready).
 
 ## Phase 1 — Frontend (mock data only, no backend calls yet)
-- [ ] T1.1: Build shared shell — Navbar + routing (Community / Carpool / Food / Login / Signup).
-- [ ] T1.2: Build Login and Signup pages (UI only, form validation, fake submit handler).
-- [ ] T1.3: Build Community Feed page with mock post list (`PostCard` component).
+- [ ] T1.0: Create `styles/tokens.css` (design tokens per ARCHITECTURE.md Section 5.2) + base `components/ui/Button.jsx`, `Card.jsx`, `Input.jsx`. Render a throwaway style-guide view to sanity check colors before building real pages.
+- [ ] T1.1: Build shared shell — Navbar + routing (Community / Carpool / Food / Profile / Login / Signup). Community is the default post-login route.
+- [ ] T1.2: Build Login and Signup pages (UI only, form validation, fake submit handler) — this is the landing page.
+- [ ] T1.3: Build Community Feed page with mock post list (`PostCard` component), styled per ARCHITECTURE.md 5.2 (card-feed layout, dark palette).
 - [ ] T1.4: Build Post Detail page with mock comments (`CommentList`, `CommentForm`).
 - [ ] T1.5: Build Carpool List page with mock rides (`RideCard`).
-- [ ] T1.6: Build Carpool Detail page with static `MapView` (placeholder map, real key added later) + mock request button.
+- [ ] T1.6: Build Carpool Detail page with static `MapView` (placeholder map, real key added later) + mock request button, styled per the map/bottom-sheet reference.
 - [ ] T1.7: Build Carpool Create page (form: origin, destination, time, seats, notes).
-- [ ] T1.8: Build Food page with mock place list (`PlaceCard`) + static map placeholder.
+- [ ] T1.8: Build Food page with mock place list (`PlaceCard`) + static map placeholder, styled per the hero/grid reference.
+- [ ] T1.9: Build Profile page (mock data) — own info display/edit form + "My Posts" / "My Rides" tabs.
 - [ ] ✅ Checkpoint: full frontend click-through works end-to-end on mock data before moving to Phase 2.
 
 ## Phase 2 — Backend
@@ -26,6 +28,7 @@ Each task should be built, then manually checked/run, before starting the next o
 - [ ] T2.4: Build `community/routes.py` — posts + comments endpoints. Test.
 - [ ] T2.5: Build `carpool/routes.py` — rides, requests, accept/decline. Test.
 - [ ] T2.6: Build `food/routes.py` — Places API proxy endpoint + favorites endpoints. Test (will need the real Places key to fully verify — until then, confirm the endpoint at least calls out correctly and handles a missing/invalid key gracefully).
+- [ ] T2.7: Add `PATCH /auth/me` + `GET /profile`, `GET /profile/posts`, `GET /profile/rides` endpoints. Test.
 - [ ] ✅ Checkpoint: all endpoints tested individually (e.g. via FastAPI's `/docs` Swagger UI) before integration.
 
 ## Phase 3 — Integration
@@ -33,7 +36,8 @@ Each task should be built, then manually checked/run, before starting the next o
 - [ ] T3.2: Wire Community pages to real `/posts` and `/comments` endpoints.
 - [ ] T3.3: Wire Carpool pages to real `/carpool` endpoints; add real Google Maps key to render live maps.
 - [ ] T3.4: Wire Food page to real `/food/recommendations` endpoint; confirm map + place cards render live data.
-- [ ] T3.5: Full end-to-end pass: sign up → post a question → get a comment → post a ride → request a seat → accept it → search food → save a favorite. Fix any bugs found.
+- [ ] T3.5: Wire Profile page to real `/profile` endpoints (view/edit info, My Posts, My Rides).
+- [ ] T3.6: Full end-to-end pass: sign up → post a question → get a comment → post a ride → request a seat → accept it → search food → save a favorite → edit profile. Fix any bugs found.
 - [ ] ✅ Checkpoint: MVP complete.
 
 ## Deferred (explicitly out of MVP — do not build now)

@@ -36,6 +36,13 @@ Solo-built, one project, three independent features sharing one login and one sh
 - Results shown as cards (name, rating, distance) + map.
 - User can save a place to **favorites**.
 
+### 3.4 Profile
+**Goal:** Let a user view and lightly manage their own identity and activity.
+- View own name, email, department, year, bio.
+- Edit department, year, bio (email/name not editable in MVP).
+- View own posts ("My Posts") and own carpool rides ("My Rides") as simple lists.
+- No public profile viewing of other users in MVP — this is a self-view only screen.
+
 ## 4. Explicitly Out of Scope for MVP
 - Real-time chat/messaging
 - Push notifications / email notifications
@@ -48,10 +55,13 @@ Solo-built, one project, three independent features sharing one login and one sh
 - Mobile app (this is web-only)
 
 ## 5. Core User Flows
-1. **Sign up / Log in** → JWT stored client-side → lands on Community feed.
-2. **Community:** Feed → Post detail → Add comment.
-3. **Carpool:** Ride list → Post a ride (map picker) → Ride detail → Request seat → Driver accepts/declines.
-4. **Food:** Food page → Search/browse → View on map → Save favorite.
+1. **Landing page is the Login page.** New users tap through to Signup; returning users log in directly.
+2. **Sign up / Log in** → JWT stored client-side → lands on **Community feed** (this is the post-login home screen).
+3. From Community, the Navbar (Community / Carpool / Food / Profile) is available on every screen — user can jump to any feature at any time.
+4. **Community:** Feed → Post detail → Add comment.
+5. **Carpool:** Ride list → Post a ride (map picker) → Ride detail → Request seat → Driver accepts/declines.
+6. **Food:** Food page → Search/browse → View on map → Save favorite.
+7. **Profile:** View own info → Edit department/year/bio → View "My Posts" / "My Rides" tabs.
 
 ## 6. Edge Cases to Handle
 **Community**

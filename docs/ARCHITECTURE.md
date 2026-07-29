@@ -21,7 +21,8 @@ campus-connect/
 │   │   │   ├── CarpoolListPage.jsx
 │   │   │   ├── CarpoolDetailPage.jsx
 │   │   │   ├── CarpoolCreatePage.jsx
-│   │   │   └── FoodPage.jsx
+│   │   │   ├── FoodPage.jsx
+│   │   │   └── ProfilePage.jsx
 │   │   ├── components/
 │   │   │   ├── Navbar.jsx
 │   │   │   ├── PostCard.jsx
@@ -30,13 +31,20 @@ campus-connect/
 │   │   │   ├── RideCard.jsx
 │   │   │   ├── RideRequestButton.jsx
 │   │   │   ├── MapView.jsx
-│   │   │   └── PlaceCard.jsx
+│   │   │   ├── PlaceCard.jsx
+│   │   │   └── ui/                # shared base components (design system)
+│   │   │       ├── Button.jsx
+│   │   │       ├── Card.jsx
+│   │   │       └── Input.jsx
+│   │   ├── styles/
+│   │   │   └── tokens.css         # color/typography variables, see Section 5
 │   │   ├── api/
 │   │   │   ├── client.js        # axios instance, attaches JWT
 │   │   │   ├── auth.js
 │   │   │   ├── community.js
 │   │   │   ├── carpool.js
-│   │   │   └── food.js
+│   │   │   ├── food.js
+│   │   │   └── profile.js
 │   │   ├── context/
 │   │   │   └── AuthContext.jsx
 │   │   ├── assets/
@@ -84,6 +92,7 @@ campus-connect/
 | password_hash | text | |
 | department | text | nullable |
 | year | int | nullable, e.g. 1–4 |
+| bio | text | nullable, shown on Profile page |
 | created_at | datetime | |
 
 **posts** (Community)
@@ -144,6 +153,12 @@ campus-connect/
 - `POST /auth/signup` — {name, email, password, department, year} → user + JWT
 - `POST /auth/login` — {email, password} → JWT
 - `GET /auth/me` — (auth required) → current user profile
+- `PATCH /auth/me` — (auth required) {department?, year?, bio?} → update own profile fields
+
+**Profile**
+- `GET /profile` — (auth) alias of `/auth/me`, returns current user + their post/ride counts
+- `GET /profile/posts` — (auth) list of the current user's own posts
+- `GET /profile/rides` — (auth) list of rides the current user is driving
 
 **Community**
 - `GET /posts` — list all posts, newest first
@@ -166,10 +181,54 @@ campus-connect/
 
 All authenticated endpoints expect `Authorization: Bearer <JWT>`.
 
-## 5. UI/UX Notes
-- A `frontend/src/assets/design-reference/` folder is reserved for your template image. Once added, Claude Code should read it before building shared layout/components (Navbar, cards, color palette, typography) so the generated UI matches your reference rather than a generic default.
-- Shared shell: Navbar (Community / Carpool / Food / Profile), consistent card + button styling across all three features.
-- Build order for frontend (Phase 1, mock data only): Auth pages → Community → Carpool (with static map) → Food (with map).
+## 5. UI/UX & Design System
+
+### 5.1 Reference templates
+Uploaded reference screenshots live conceptually in `frontend/src/assets/design-reference/` (Claude Code should read them before building any shared components). They show three different visual styles:
+- **Carpool references** — dark background, purple/violet primary buttons, teal/cyan map markers, rounded bottom-sheet cards over a live map.
+- **Community reference** — light, card-feed layout (subreddit tiles, post cards with thumbnail/upvote count).
+- **Food references** — light, hero banner + browse grid of place/dish cards, red/orange/yellow accents.
+
+### 5.2 Unified design decision
+Per owner direction ("same color theme, each feature has its own design"): the site uses **one shared color palette and typography sitewide**, while each feature keeps **its own layout/structure** from its reference, re-skinned into that shared palette.
+
+**Shared tokens (`frontend/src/styles/tokens.css`):**
+```css
+:root {
+  --color-bg:            #121218;   /* app background, dark */
+  --color-surface:       #1C1C24;   /* cards, sheets */
+  --color-primary:       #7B5CFA;   /* purple — primary buttons, active nav, links */
+  --color-primary-hover: #6A4CE0;
+  --color-accent:        #2FD9C4;   /* teal — map markers, highlights */
+  --color-text:          #F5F5F7;
+  --color-text-muted:    #9A9AA5;
+  --color-border:        #2A2A33;
+  --color-success:       #34D399;
+  --color-danger:        #F87171;
+  --radius-card: 16px;
+  --font-family: 'Inter', system-ui, sans-serif;
+}
+```
+
+**Per-feature layout mapping (colors above apply to all, only layout differs):**
+| Feature | Layout kept from reference | Notes |
+|---|---|---|
+| Carpool | Map + bottom-sheet card, "Your location → Destination" row, purple CTA button, seat count stepper | Closest match to shared theme already — least re-skinning needed |
+| Community | Horizontal filter/tag chips at top, card feed with thumbnail + comment count | Recolor light cards → dark `--color-surface` cards, keep the tile/feed structure |
+| Food | Hero search banner, grid of place cards with % badge / rating | Recolor red/orange/yellow → `--color-primary`/`--color-accent`, keep hero + grid structure |
+| Profile | New page, not in references | Simple layout: avatar placeholder, name/dept/year/bio, tabs for "My Posts" / "My Rides" |
+
+### 5.3 Shared shell
+- Navbar/tab bar: **Community / Carpool / Food / Profile** (Community is the home tab after login).
+- Base components (`components/ui/Button.jsx`, `Card.jsx`, `Input.jsx`) should be built once, styled from `tokens.css`, and reused across all four pages so the palette actually stays consistent instead of being redefined per page.
+
+### 5.4 Navigation flow
+- **Landing page = Login page** (no marketing splash screen for MVP).
+- After login/signup → redirect to **Community feed** (home).
+- From Community, Navbar links to Carpool, Food, or Profile at any time.
+
+### 5.5 Build order
+Frontend (Phase 1, mock data only): **Design tokens + base UI components → Auth pages → Community → Carpool (static map) → Food → Profile.**
 
 ## 6. API Keys / Environment Variables
 Claude Code should **only reference key names and file locations**, never generate or guess real key values. You will paste real values in manually.

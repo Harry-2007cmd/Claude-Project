@@ -14,3 +14,12 @@
 
 ### Removed
 - All prior planning artifacts related to the mentorship-matching-only concept are superseded (not merged forward — explicitly discarded per owner request).
+
+## [Unreleased] — 2026-07-29 (later same day)
+### Added
+- **Profile page** added to MVP scope: view/edit own department, year, bio; view own posts and own rides. New nullable `bio` column on `users`. New endpoints `PATCH /auth/me`, `GET /profile`, `GET /profile/posts`, `GET /profile/rides`.
+- Concrete design system defined from owner-uploaded reference screenshots: shared color tokens (`tokens.css`) — dark background, purple `#7B5CFA` primary, teal `#2FD9C4` accent — applied sitewide, with each feature keeping its own reference layout (Community = card feed, Carpool = map + bottom sheet, Food = hero + grid).
+- Navigation flow clarified: Login page is the landing page; Community feed is the home screen post-auth; persistent Navbar (Community / Carpool / Food / Profile).
+
+### Changed
+- File structure updated: added `ProfilePage.jsx`, `api/profile.js`, `components/ui/` (Button, Card, Input), `styles/tokens.css`.
