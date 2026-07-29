@@ -4,9 +4,9 @@ Build order: **Phase 1 (Frontend, mock data) → Phase 2 (Backend) → Phase 3 (
 Each task should be built, then manually checked/run, before starting the next one.
 
 ## Phase 0 — Scaffolding
-- [ ] T0.1: Create `frontend/` (Vite + React) and `backend/` (FastAPI) skeletons per ARCHITECTURE.md folder structure.
-- [ ] T0.2: Create `backend/.env` and `frontend/.env` with placeholder key names only (no real values) — see ARCHITECTURE.md Section 6.
-- [ ] T0.3: Create `frontend/src/assets/design-reference/` folder for the template image (owner to drop file in when ready).
+- [x] T0.1: Create `frontend/` (Vite + React) and `backend/` (FastAPI) skeletons per ARCHITECTURE.md folder structure.
+- [x] T0.2: Create `backend/.env` and `frontend/.env` with placeholder key names only (no real values) — see ARCHITECTURE.md Section 6.
+- [x] T0.3: Create `frontend/src/assets/design-reference/` folder for the template image (owner to drop file in when ready).
 
 ## Phase 1 — Frontend (mock data only, no backend calls yet)
 - [ ] T1.0: Create `styles/tokens.css` (design tokens per ARCHITECTURE.md Section 5.2) + base `components/ui/Button.jsx`, `Card.jsx`, `Input.jsx`. Render a throwaway style-guide view to sanity check colors before building real pages.

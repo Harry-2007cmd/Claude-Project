@@ -23,3 +23,14 @@
 
 ### Changed
 - File structure updated: added `ProfilePage.jsx`, `api/profile.js`, `components/ui/` (Button, Card, Input), `styles/tokens.css`.
+
+## [Unreleased] — 2026-07-29 (Phase 0 scaffolding)
+### Added
+- **Phase 0 complete (T0.1–T0.3).** `frontend/` (Vite + React) and `backend/` (FastAPI) skeletons created per ARCHITECTURE.md Section 2 — every file/folder in the structure exists as a documented stub, to be filled in at its assigned task.
+- `backend/app/main.py` with the FastAPI app, CORS locked to `FRONTEND_ORIGIN`, and a `/health` endpoint; `backend/requirements.txt`.
+- `backend/.env` and `frontend/.env` with placeholder key **names** only (ARCHITECTURE.md Section 6) — real values pasted in manually by the owner.
+- `.gitignore` entries so `.env`, `*.db`, and `.venv/` are never committed.
+- `frontend/src/assets/design-reference/` folder for the owner's reference screenshots.
+
+### Changed
+- Replaced the default Vite template `App.jsx`/`main.jsx`/`index.html` with a minimal Campus Connect placeholder shell (the template referenced logo/CSS assets that don't exist in this repo).
