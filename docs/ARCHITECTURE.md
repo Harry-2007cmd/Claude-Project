@@ -4,7 +4,7 @@
 - **Frontend:** React (Vite), **plain CSS** (settled at T1.0 — no Tailwind; all tokens and shared component styles live in `styles/tokens.css`), `react-router-dom` for routing
 - **Backend:** Python, FastAPI
 - **Database:** SQLite, auto-created and auto-seeded by a seed script (no manual DB setup required)
-- **Auth:** Email/password + JWT (via `passlib` for hashing, `python-jose` for JWT)
+- **Auth:** Email/password + JWT (via `passlib` for hashing, `python-jose` for JWT). `bcrypt` is pinned to `>=4.0,<5`: passlib 1.7.4 probes its bcrypt backend with a >72-byte secret, which bcrypt 5.0 rejects instead of truncating, so passlib cannot load bcrypt at all with 5.x. Discovered at T2.2.
 - **Maps/Places:** Google Maps JavaScript API (display) + Google Places API (search, proxied via backend)
 
 ## 2. Repository Structure
@@ -94,6 +94,14 @@ campus-connect/
 
 ## 3. Database Schema (SQLite)
 
+Implemented in `backend/app/models.py` at T2.1. Two conventions apply to every
+table below:
+- **Timestamps are stored as naive UTC.** SQLite has no timezone type and drops
+  `tzinfo` on write, so values are normalised to naive UTC going in — that keeps
+  comparisons like "is this ride in the past?" between two naive datetimes.
+- **Foreign keys are enforced.** SQLite ignores `FOREIGN KEY` unless asked, so
+  `database.py` issues `PRAGMA foreign_keys=ON` on every connection.
+
 **users**
 | column | type | notes |
 |---|---|---|
@@ -137,7 +145,12 @@ campus-connect/
 | departure_time | datetime | |
 | seats_available | int | |
 | notes | text | nullable |
+| status | text | `active` / `cancelled`, default `active` — added at T2.1 |
 | created_at | datetime | |
+
+`status` was not in the original table sketch. It is required because PRD
+Section 6 says a ride cancelled after requests were accepted must report itself
+as cancelled rather than disappear, and the frontend already renders that state.
 
 **carpool_requests**
 | column | type | notes |
@@ -145,8 +158,11 @@ campus-connect/
 | id | int, PK | |
 | ride_id | int, FK → carpool_rides | |
 | passenger_id | int, FK → users | |
-| status | text | `pending` / `accepted` / `declined` |
+| status | text | `pending` / `accepted` / `declined`, default `pending` |
 | created_at | datetime | |
+
+Unique on `(ride_id, passenger_id)` — one request per passenger per ride, which
+is what the frontend's "already requested" button state assumes.
 
 **food_favorites**
 | column | type | notes |
@@ -158,13 +174,23 @@ campus-connect/
 | place_data | text (json) | cached snapshot from Places API |
 | created_at | datetime | |
 
+Unique on `(user_id, place_id)` — "duplicate favorite save → prevent duplicate
+entries" (PRD Section 6) is enforced in the DB, not only in the UI.
+
 ## 4. API Design (FastAPI, REST, JSON)
 
 **Auth**
-- `POST /auth/signup` — {name, email, password, department, year} → user + JWT
-- `POST /auth/login` — {email, password} → JWT
+- `POST /auth/signup` — {name, email, password, department, year} → 201, user + JWT
+- `POST /auth/login` — {email, password} → JWT **+ user** (the extra user object saves the frontend a follow-up `/auth/me` on every login, since the navbar needs the name immediately)
 - `GET /auth/me` — (auth required) → current user profile
 - `PATCH /auth/me` — (auth required) {department?, year?, bio?} → update own profile fields
+
+Auth conventions settled at T2.3:
+- Tokens are HS256 JWTs with the user id in `sub`, expiring after 7 days. No refresh-token flow in the MVP.
+- Emails are stored and matched lowercased, so `Demo@campus.edu` and `demo@campus.edu` are one account.
+- Login answers `401 "Incorrect email or password."` for both a wrong password and an unknown email, and pays for a bcrypt verify either way, so accounts can't be enumerated by message or by timing.
+- Duplicate signup → `409`; schema violations (short password, bad email, blank name, year outside 1–4) → `422`.
+- Swagger uses an `HTTPBearer` scheme, so `/docs` gets an Authorize button that takes a pasted token — matching the frontend's `Authorization: Bearer <JWT>` rather than an OAuth2 form login.
 
 **Profile**
 - `GET /profile` — (auth) alias of `/auth/me`, returns current user + their post/ride counts

@@ -138,3 +138,60 @@
 
 ### Removed
 - `frontend/public/icons.svg` — a leftover of the deleted Vite template `App.jsx`, referenced by nothing.
+
+## [Unreleased] — 2026-07-30 (Phase 1 checkpoint verified)
+### Notes
+- **Phase 1 checkpoint passed.** The running app was driven end-to-end in headless Chromium on mock data: 67 assertions covering the login/signup guards and validation, feed + chip filters + composer, post detail + commenting, the ride list's upcoming-only filter, seat request, 0-seat/cancelled/own-ride states, driver accept/decline, ride creation validation and the seat stepper, food search/no-results/save/favorites, profile edit + persistence + both tabs, the 404 state, and log out → log back in. No console or page errors; `oxlint` and `vite build` both clean.
+- Cosmetic, placeholder-only: on the ride detail page the `MapView` route pins sit at the SVG edges and one is partly covered by the bottom sheet. Not worth fixing — the SVG is replaced by the live Google Map in T3.3.
+
+## [Unreleased] — 2026-07-30 (T2.1 — database engine + models)
+### Added
+- `backend/app/database.py`: SQLAlchemy 2.0 engine from `DATABASE_URL`, `SessionLocal`, declarative `Base`, the `get_db()` request-scoped session dependency, and `init_db()`. Two SQLite-specific details are handled: `check_same_thread=False` (FastAPI serves from a thread pool) and a `PRAGMA foreign_keys=ON` connect listener, without which every foreign key would be decorative.
+- `backend/app/models.py`: all six tables from ARCHITECTURE.md Section 3 — `User` (including the nullable `bio` column per D15), `Post`, `Comment`, `CarpoolRide`, `CarpoolRequest`, `FoodFavorite` — as typed `Mapped[...]` models with relationships both ways, plus status constants (`pending`/`accepted`/`declined`, `active`/`cancelled`).
+- Table creation on startup via a FastAPI `lifespan` hook in `main.py`, so the owner never runs a migration or setup step (D3). `seed_if_empty()` joins the same hook in T2.2.
+
+### Changed
+- **`carpool_rides` gained a `status` column** (`active`/`cancelled`, default `active`), which was missing from the ARCHITECTURE.md Section 3 sketch. PRD Section 6 requires a cancelled ride to report itself as cancelled instead of vanishing, and the Phase 1 frontend already renders that state. ARCHITECTURE.md Section 3 updated.
+- Unique constraints added and documented: `(ride_id, passenger_id)` on `carpool_requests` (one request per passenger per ride, matching the frontend's "already requested" state) and `(user_id, place_id)` on `food_favorites` (PRD Section 6's duplicate-favorite rule, now enforced in the DB rather than only in the UI).
+- Timestamps are stored as **naive UTC** — SQLite drops `tzinfo` on write, so normalising on the way in avoids mixed aware/naive comparisons in the "is this ride in the past?" query. Documented at the top of ARCHITECTURE.md Section 3.
+
+### Notes
+- Verified by booting the app's startup hook and inspecting the resulting `backend/campus_connect.db`: all six tables present with the expected columns, `users.bio` present, `users.email` uniquely indexed, foreign keys rejecting an orphan comment, and a duplicate favorite rejected. The DB is left empty so T2.2's "seed only if empty" path is exercised on the next start.
+
+## [Unreleased] — 2026-07-30 (T2.2 — dummy data seeder)
+### Added
+- `backend/app/seed.py`: `seed_if_empty()`, called from the startup hook after `init_db()`. Seeds 14 users, 5 posts, 8 comments, 6 rides and 3 seat requests, and no-ops once any user exists so restarts never duplicate rows. Fixtures mirror `frontend/src/mocks/` so that when Phase 3 swaps the frontend onto the real API the screens show the same content — any difference is then a wiring bug, not different data. Also runnable standalone with `python -m app.seed`.
+- Seeded rides reproduce the PRD Section 6 edge cases directly in the data: one full ride (0 seats), one already departed, one soft-cancelled, and one driven by the demo user carrying two pending + one accepted request. One post is left with zero comments so the "No answers yet" state has real data behind it.
+- A documented demo account: **`demo@campus.edu` / `campus1234`** (every seeded account shares the password — local dummy data only, and the DB file is gitignored). It owns the two posts and the one ride that the Phase 1 frontend attributed to "You", so Profile → My Posts / My Rides have content. Recorded in the root README.
+- `backend/app/auth/utils.py`: `hash_password()` / `verify_password()` using passlib bcrypt. This is T2.3's module, but the hashing half landed here because the seeder needs real hashes and the alternative was configuring bcrypt in two places. The JWT helpers and `get_current_user` still arrive in T2.3.
+
+### Fixed
+- **`bcrypt` pinned to `>=4.0,<5`** in `requirements.txt`. passlib 1.7.4 (its last release, 2020) probes its bcrypt backend with a >72-byte secret; bcrypt 5.0 raises `ValueError` on that instead of truncating, so passlib could not load bcrypt at all and *every* password hash call failed. This would have blocked T2.3 entirely. Noted in ARCHITECTURE.md Section 1 — the alternative, moving off the unmaintained passlib (DECISIONS.md D4) to `bcrypt` directly or `pwdlib`, is left as an owner decision.
+- `hash_password`/`verify_password` truncate to bcrypt's 72-byte limit identically, so a very long password works instead of 500-ing on signup.
+- Seed log lines print with `flush=True` — uvicorn leaves stdout block-buffered when it isn't a terminal, which was swallowing them entirely.
+- passlib's bcrypt version-probe warning (it reads `bcrypt.__about__`, which modern bcrypt dropped) is silenced, since it logged a full traceback on first hash and read like a crash in the server output.
+
+### Notes
+- Timestamps are relative to seed time, so seeded "upcoming" rides age out after a couple of days. Delete `backend/campus_connect.db` and restart for a fresh set — documented in the seeder docstring and the README.
+- `food_favorites` is deliberately left unseeded: its `place_data` column holds a JSON snapshot of a Places API response, and that shape isn't defined until the proxy lands in T2.6. Seeding an invented shape now would just have to be redone.
+- Verified on a fresh DB: correct row counts, a second `seed_if_empty()` run leaving them unchanged, the demo password verifying against a stored bcrypt hash (and a wrong password failing), the feed ordering newest-first, exactly one zero-comment post, 4 upcoming / 1 departed / 1 cancelled / 1 full ride matching the frontend's 4-card list, and relationships navigable both ways. Server boots clean with `/docs` at 200 — but `/health` is still the only route until T2.3.
+
+## [Unreleased] — 2026-07-30 (T2.3 — auth routes + JWT)
+### Added
+- `backend/app/schemas.py`: `UserPublic`, `SignupRequest`, `LoginRequest`, `TokenResponse`. `password_hash` appears in no response model — that is what having response models is for (ARCHITECTURE.md Section 7). Signup validation mirrors the frontend's own rules: 8-character minimum password, valid email, non-blank name, year 1–4.
+- `backend/app/auth/utils.py` gained the JWT half: `create_access_token()` (HS256, user id in `sub`, 7-day expiry), `decode_access_token()`, and the `get_current_user` dependency. `get_current_user` resolves the token to a live `User` row, so a token for a since-deleted user is rejected rather than trusted.
+- `backend/app/auth/routes.py`: `POST /auth/signup` (→ 201 with token + user, so signup lands straight in the app), `POST /auth/login`, `GET /auth/me`. Router wired into `main.py`; `/health` moved under its own Swagger tag.
+- Swagger uses an `HTTPBearer` scheme, giving `/docs` an Authorize button that takes a pasted token. `OAuth2PasswordBearer` would have rendered a username/password form, which doesn't match our JSON login body.
+
+### Changed
+- **`POST /auth/login` returns the user object alongside the JWT**, where ARCHITECTURE.md Section 4 promised only a JWT. The navbar renders the user's name immediately after login, so this saves a follow-up `GET /auth/me` on every login. Documented in Section 4.
+- Emails are normalised to lowercase on both signup and login. SQLite's unique index is case-sensitive, so without this `Demo@campus.edu` and `demo@campus.edu` would have become two accounts.
+
+### Security
+- Login answers the same `401 "Incorrect email or password."` for a wrong password and an unknown email, and verifies against a dummy hash when the email doesn't exist — so neither the message nor the response time reveals whether an account exists (measured 338ms vs 328ms).
+- A JWT signed with a different secret, an expired JWT, a malformed token, a missing token, and a valid token for a nonexistent user id are all rejected with 401.
+- Startup logs a warning if `JWT_SECRET_KEY` is still the `.env` placeholder, including the `secrets.token_urlsafe(32)` command for the owner to generate their own. No key value is ever generated or written by Claude Code (D10).
+
+### Notes
+- Verified with 21 checks over real HTTP against a running server, plus the Swagger UI driven in a browser: all three routes listed under an `auth` tag, `/auth/me` showing the auth padlock, and the Authorize dialog offering `HTTPBearer`. Test-created accounts were removed afterwards, leaving the 14 seeded users.
+- `python-multipart` is now unused (it exists for OAuth2 form logins), but is left in `requirements.txt` — it's a FastAPI standard-extras dependency and harmless.

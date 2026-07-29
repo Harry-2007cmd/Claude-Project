@@ -4,6 +4,11 @@ sqlalchemy
 pydantic[email]
 python-dotenv
 passlib[bcrypt]
+# passlib 1.7.4 (last release 2020) probes its bcrypt backend with a >72-byte
+# secret. bcrypt 5.0 raises on that instead of truncating, so passlib cannot
+# load bcrypt at all and every hash call dies. Pinned below 5 until/unless we
+# move off passlib — see DECISIONS.md D4.
+bcrypt>=4.0,<5
 python-jose[cryptography]
 python-multipart
 httpx

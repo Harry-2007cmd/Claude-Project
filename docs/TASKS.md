@@ -20,12 +20,12 @@ Each task should be built, then manually checked/run, before starting the next o
 - [x] T1.8: Build Food page with mock place list (`PlaceCard`) + static map placeholder, styled per the hero/grid reference.
 - [x] T1.9: Build Profile page (mock data) — own info display/edit form + "My Posts" / "My Rides" tabs.
 - [x] T1.10: Build the "Ask a question" composer modal on the Community feed (title, body, optional department tag). Added after the fact — PRD 3.1 requires post creation but no original task covered it.
-- [ ] ✅ Checkpoint: full frontend click-through works end-to-end on mock data before moving to Phase 2.
+- [x] ✅ Checkpoint: full frontend click-through works end-to-end on mock data before moving to Phase 2. Verified by driving the running app in headless Chromium — 67 assertions across all nine pages, no console or page errors.
 
 ## Phase 2 — Backend
-- [ ] T2.1: Set up `database.py` (SQLite engine) + `models.py` (all tables from ARCHITECTURE.md Section 3).
-- [ ] T2.2: Write `seed.py` — auto-seeds dummy users/posts/rides/comments on first run if DB is empty.
-- [ ] T2.3: Build `auth/routes.py` — signup, login, JWT issuing, `/auth/me`. Test with a REST client.
+- [x] T2.1: Set up `database.py` (SQLite engine) + `models.py` (all tables from ARCHITECTURE.md Section 3). Tables are created on startup via a FastAPI lifespan hook.
+- [x] T2.2: Write `seed.py` — auto-seeds dummy users/posts/rides/comments on first run if DB is empty. Fixtures mirror `frontend/src/mocks/` and reproduce the PRD Section 6 carpool edge cases. Password hashing (`auth/utils.py`) landed here too, since the seeder needs real bcrypt hashes; the JWT half of that module is still T2.3.
+- [x] T2.3: Build `auth/routes.py` — signup, login, JWT issuing, `/auth/me`. Test with a REST client. Verified over HTTP + in the Swagger UI (21 checks, including forged/expired/ghost tokens and account-enumeration resistance).
 - [ ] T2.4: Build `community/routes.py` — posts + comments endpoints. Test.
 - [ ] T2.5: Build `carpool/routes.py` — rides, requests, accept/decline. Test.
 - [ ] T2.6: Build `food/routes.py` — Places API proxy endpoint + favorites endpoints. Test (will need the real Places key to fully verify — until then, confirm the endpoint at least calls out correctly and handles a missing/invalid key gracefully).

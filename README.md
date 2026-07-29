@@ -33,6 +33,12 @@ uvicorn app.main:app --reload
 ```
 Swagger docs available at `http://localhost:8000/docs` once running.
 
+The SQLite database is created and seeded with dummy data automatically on first
+start — there is no migration or setup step. Every seeded account shares the
+password `campus1234`; log in as **`demo@campus.edu`**, which owns the seeded
+posts and the ride that has pending seat requests. To reset to fresh dummy data,
+delete `backend/campus_connect.db` and restart.
+
 ### Frontend
 ```bash
 cd frontend
